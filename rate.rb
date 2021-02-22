@@ -4,23 +4,24 @@ class Rate
   AVAILABLE_CURRENCIES = []
   API_URL = 'https://api.exchangeratesapi.io/'
 
-  attr_accessor :base, :hash_response
+  attr_accessor :hash_response, :currency_1_base, :currency_2_base, :rate
 
-  def initialize(base = nil)
-    @base = base
+  def initialize(currency_1_base = nil, currency_2_base = nil)
+    @currency_1_base = nil
+    @currency_2_base = nil
   end
 
-  def weather_url(param)
-    @weather = "#{API_URL}latest?base=#{param}"
+  def rate_url(param)
+    @rate = "#{API_URL}latest?base=#{param}"
   end
 
-  def weather_response
-    @response_body ||= RestClient.get(@weather).body
+  def rate_response
+    @response_body ||= RestClient.get(@rate).body
     JSON(@response_body)
   end
 
   def specific_currency(currency)
-    @response_body ||= RestClient.get(@weather).body
+    @response_body ||= RestClient.get(@rate).body
     @hash_response = JSON.parse(@response_body)['rates'].select { |element| element.to_s == currency }
   end 
 

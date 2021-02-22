@@ -15,83 +15,76 @@ Telegram::Bot::Client.run(token) do |bot|
       bot.api.send_message(chat_id: message.chat.id, text: "Welcome to currency rates bot, where you can see rate for specific or all available currencies")
       bot.api.send_message(chat_id: message.chat.id, text: "Available options")
       bot.api.send_message(chat_id: message.chat.id, text: "/rate (specific currency), /all (available currencies), /world (world currencies rate)")
-      # bot.api.send_message(chat_id: message.chat.id, text: "Type in currency, exchange rate")
       @ruby_bot.session = true 
-      @ruby_bot.cash = false
-      @rate.base = false 
     when '/stop'
       bot.api.send_message(chat_id: message.chat.id, text: "Bye, #{message.from.first_name}")
       @ruby_bot.session = false 
+      @ruby_bot.setuped_all = false 
+      @ruby_bot.setuped_specific = false 
     when '/rate'
       bot.api.send_message(chat_id: message.chat.id, text: "Here you can see real-time rate for specific currency")
       bot.api.send_message(chat_id: message.chat.id, text: "Please type currency for which you want to see rate")
-      unless @ruby_bot.cash
-        bot.api.send_message(chat_id: message.chat.id, text: "Setup currency_1")
-      end
-        # @ruby_bot.set_currency = false 
-        # if @ruby_bot.set_currency 
-        #   @ruby_bot.cash = message.text 
-        #   bot.api.send_message(chat_id: message.chat.id, text: "Your setuped you currency #{@ruby_bot.cash}")
-        #   bot.api.send_message(chat_id: message.chat.id, text: "Know please currency for which you wanna to convert the rate")
-        #   @ruby_bot.set_currency = true 
-        # else
-        #   @rate.base = message.text
-        #   @rate.base.to_s
-        #   @rate.weather_url(@rate.base)
-        #   bot.api.send_message(chat_id: message.chat.id, text: "Your base currency, #{@rate.base}")
-        #   # bot.api.send_message(chat_id: message.chat.id, text: "Response #{@rate.weather_response}")
-        #   bot.api.send_message(chat_id: message.chat.id, text: "Response #{@rate.specific_currency(@ruby_bot.cash)}")
-        #   # @rate.specific_currency(@ruby_bot.cash)
-        #   bot.api.send_message(chat_id: message.chat.id, text: "Response #{@rate.hash_response}")
-        #   @ruby_bot.set_currency = false 
-        # end
+      @ruby_bot.setuped_all = false 
+      @ruby_bot.setuped_specific = true 
+      bot.api.send_message(chat_id: message.chat.id, text: "Setup currency_1")
+      # unless @ruby_bot.cash
+      #   bot.api.send_message(chat_id: message.chat.id, text: "Setup currency_1")
+      # end
     when '/world' 
       bot.api.send_message(chat_id: message.chat.id, text: "Here you can see real-time rate for all currencies")
       bot.api.send_message(chat_id: message.chat.id, text: "Please type currency for which you want to see rate")
-      @rate.base = message.text
-      @rate.base.to_s.upcase
-      if Rate::AVAILABLE_CURRENCIES.include?(@rate.base)
-        @rate.weather_url(@rate.base)
-        bot.api.send_message(chat_id: message.chat.id, text: "#{@rate.weather_response}")
-      else 
-        bot.api.send_message(chat_id: message.chat.id, text: "Please select from available currencies")
-        bot.api.send_message(chat_id: message.chat.id, text: "Available currencies")
-        bot.api.send_message(chat_id: message.chat.id, text: "#{@rate.parse_availbale_curencies}")
-      end 
+      @ruby_bot.setuped_all = true 
+      @ruby_bot.setuped_specific = false 
+      bot.api.send_message(chat_id: message.chat.id, text: "Setup your base currency")
+      # unless @rate.currency_1_base
+      #   bot.api.send_message(chat_id: message.chat.id, text: "Setup your base currency")
+      #   @ruby_bot.cash = 0
+      # end
+      # if Rate::AVAILABLE_CURRENCIES.include?(@rate.base)
+      #   @rate.weather_url(@rate.base)
+      #   bot.api.send_message(chat_id: message.chat.id, text: "#{@rate.weather_response}")
+      # else 
+      #   bot.api.send_message(chat_id: message.chat.id, text: "Please select from available currencies")
+      #   bot.api.send_message(chat_id: message.chat.id, text: "Available currencies")
+      #   bot.api.send_message(chat_id: message.chat.id, text: "#{@rate.parse_availbale_curencies}")
+      # end 
     when '/all'
       bot.api.send_message(chat_id: message.chat.id, text: "Available currencies")
       bot.api.send_message(chat_id: message.chat.id, text: "#{@rate.parse_availbale_curencies}")
     else 
-      if !@ruby_bot.cash
-        @ruby_bot.cash = message.text 
-        bot.api.send_message(chat_id: message.chat.id, text: "Your setuped you currency #{@ruby_bot.cash}")
-        bot.api.send_message(chat_id: message.chat.id, text: "Know please select base exchange currency")
-      elsif !@rate.base
-        @rate.base = message.text 
-        @rate.base.to_s
-        @rate.weather_url(@rate.base)
-        bot.api.send_message(chat_id: message.chat.id, text: "Your base currency, #{@rate.base}")
-      #   bot.api.send_message(chat_id: message.chat.id, text: "Response #{@rate.weather_response}")
-        bot.api.send_message(chat_id: message.chat.id, text: "Response #{@rate.specific_currency(@ruby_bot.cash)}")
-      #   bot.api.send_message(chat_id: message.chat.id, text: "Response #{@rate.hash_response}")
+      if @ruby_bot.setuped_all == true 
+        @rate.currency_1_base = message.text 
+        @rate.currency_1_base.to_s
+        # if Rate::AVAILABLE_CURRENCIES.include?(@rate.currency_1_base)
+          @rate.rate_url(@rate.currency_1_base)
+          puts @rate.rate
+          bot.api.send_message(chat_id: message.chat.id, text: "Your base currency, #{@rate.currency_1_base}")
+          bot.api.send_message(chat_id: message.chat.id, text: "Response #{@rate.rate_response}")
+          @ruby_bot.setuped_all = false
+          @rate.currency_1_base = nil
+        # else
+        #   bot.api.send_message(chat_id: message.chat.id, text: "Please select from available currencies")
+        #   bot.api.send_message(chat_id: message.chat.id, text: "Available currencies")
+        #   bot.api.send_message(chat_id: message.chat.id, text: "#{@rate.parse_availbale_curencies}")
+        # end 
+      elsif @ruby_bot.setuped_specific == true 
+        if !@rate.currency_2_base
+          @rate.currency_2_base = message.text 
+          bot.api.send_message(chat_id: message.chat.id, text: "Your setuped you currency #{@rate.currency_2_base}")
+          bot.api.send_message(chat_id: message.chat.id, text: "Know please select base exchange currency")
+        elsif !@rate.currency_1_base
+          @rate.currency_1_base = message.text 
+          @rate.currency_1_base.to_s
+          @rate.rate_url(@rate.currency_1_base)
+          bot.api.send_message(chat_id: message.chat.id, text: "Your base currency, #{@rate.currency_1_base}")
+          bot.api.send_message(chat_id: message.chat.id, text: "Response #{@rate.specific_currency(@rate.currency_2_base)}")
+        end  
+        @ruby_bot.setuped_specific = false 
+        @rate.currency_1_base = nil
+        @rate.currency_2_base = nil
       else 
         bot.api.send_message(chat_id: message.chat.id, text: "Invalid event")
       end
-      # if @ruby_bot.set_currency == false 
-      #   @ruby_bot.cash = message.text 
-      #   bot.api.send_message(chat_id: message.chat.id, text: "Your setuped you currency #{@ruby_bot.cash}")
-      #   bot.api.send_message(chat_id: message.chat.id, text: "Know please select base exchange currency")
-      #   @ruby_bot.set_currency = true 
-      # elsif @ruby_bot.set_currency == true
-      #   @rate.base = message.text
-      #   @rate.base.to_s
-      #   @rate.weather_url(@rate.base)
-      #   bot.api.send_message(chat_id: message.chat.id, text: "Your base currency, #{@rate.base}")
-      #   # bot.api.send_message(chat_id: message.chat.id, text: "Response #{@rate.weather_response}")
-      #   bot.api.send_message(chat_id: message.chat.id, text: "Response #{@rate.specific_currency(@ruby_bot.cash)}")
-      #   bot.api.send_message(chat_id: message.chat.id, text: "Response #{@rate.hash_response}")
-      #   @ruby_bot.set_currency = false 
-      # end
     end
   end
 end
